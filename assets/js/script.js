@@ -13,11 +13,13 @@ var cityName = "Albuquerque";
 var weatherDescription = "";
 var weatherIcon;
 var kelvin = 0;
+var lat;
+var lon;
 var dateToday;
 var temp;
 var wind;
 var humidity;
-var uvIndex;
+var uvIndex = 0;
 
 
 //async function to fetch the openweather api
@@ -26,20 +28,21 @@ async function startWeather(cityName) {
     const responseWeather = await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apiKey)
     const dataWeather = await responseWeather.json()
 
-    createCity(dataWeather);
+    var latLon = await fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+ dataWeather.coord.lat + "&lon="+ dataWeather.coord.lon +"&exclude={part}&appid="+ apiKey)
+    var latLonConversion = await latLon.json()
+
+    createCity(dataWeather, latLonConversion);
     
 }
 
-
-fetch("https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apiKey).then(res => res.json())
-.then(data => console.log(data));
-
 //when button clicks store
 submitCityEl.addEventListener("click", function(){
+    //prevent page from loading
     event.preventDefault();
-    console.log(cityInputValue.value);
+
     cityName = cityInputValue.value;
 
+    //store names in array
     searchHistory.push(cityName);
 
     //store local storage
@@ -48,12 +51,6 @@ submitCityEl.addEventListener("click", function(){
 
     startWeather(cityName);
 
-
-    //
-
-
-
-    //startWeather(cityName);
 })
 
 function createCityBtns(searchHistory) {
@@ -77,8 +74,11 @@ function createCityBtns(searchHistory) {
     }
 }
 
-function createCity(cityName) {
+function createCity(cityName, latLonConversion) {
 
+    //get index from other api
+    uvIndex =latLonConversion.current.uvi;
+    
     //reset container to have nothing in it
     weatherContainerEl.innerHTML = "";
 
@@ -86,7 +86,10 @@ function createCity(cityName) {
     var emptyDivContainerEl = document.createElement("div");
     var cityNameEl = document.createElement("h2");
     var cityTemperatureEl = document.createElement("p");
+    var cityHumidityEl = document.createElement("p");
+    var cityWindSpeedEl = document.createElement("p");
     var iconEl = document.createElement("img");
+    var uvIndexEl = document.createElement("p");
 
     //do math to covert to farenheit
     kelvin = cityName.main.temp;
@@ -98,73 +101,38 @@ function createCity(cityName) {
 
     //weather icon
     weatherIcon = cityName.weather[0].icon;
-    console.log(weatherIcon);
 
     //img src
     iconEl.src = "http://openweathermap.org/img/wn/" + weatherIcon + "@2x.png";
 
     //add text to innerhtml
     cityNameEl.innerHTML = cityName.name;
-    cityTemperatureEl.innerHTML = "Temperature: " + fahrenheitOneDigit;
-    console.log(cityTemperatureEl);
+    cityTemperatureEl.innerHTML = "Temperature: " + fahrenheitOneDigit + " ℉";
+    cityHumidityEl.innerHTML = "Humidity: " + cityName.main.humidity + "%";
+    cityWindSpeedEl.innerHTML = "Wind Speed: " + cityName.wind.speed + " mph";
+    uvIndexEl.innerHTML = "Uv Index: " + uvIndex;
 
     //add class to elements
     cityNameEl.className = "col-9";
     cityTemperatureEl.className = "col -6";
+    cityHumidityEl.className = "col -6";
+    cityWindSpeedEl.className = "col -6";
+    uvIndexEl.className = "col -6";
 
 
     //append to dom
     emptyDivContainerEl.appendChild(cityNameEl);
-    emptyDivContainerEl.appendChild(cityTemperatureEl);
     emptyDivContainerEl.appendChild(iconEl);
+    emptyDivContainerEl.appendChild(cityTemperatureEl);
+    emptyDivContainerEl.appendChild(cityHumidityEl);
+    emptyDivContainerEl.appendChild(cityWindSpeedEl);
+    emptyDivContainerEl.appendChild(uvIndexEl);
     
-    
+    //append div to weather container
     weatherContainerEl.appendChild(emptyDivContainerEl);
-
 
     
 }
-
-
-
-
-
-// async function start() {
-
-
-// }
-
-// start();
-
-
-
-
-
-// var getUserRepos = function(user) {
-//     // format the github api url
-//     var apiUrl = "http://api.openweathermap.org/data/2.5/forecast?id=524901&appid=" + apiKey;
-//     console.log(apiUrl);
-
-
-//     // make a request to the url
-//     fetch(apiUrl)
-//         .then(function(response) {
-//             // request was successful
-//             if (response.ok) {
-//             response.json().then(function(data) {
-//                 displayRepos(data, user);
-//             });
-//             } else {
-//             alert('Error: GitHub User Not Found');
-//             }
-//         })
-//         .catch(function(error) {
-//             // Notice this `.catch()` getting chained onto the end of the `.then()` method
-//             alert("Unable to connect to GitHub");
-//         });
-// };
-
-// getUserRepos();
 
 function getWeather(cityName) {
     
