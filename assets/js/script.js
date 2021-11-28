@@ -1,3 +1,4 @@
+// dom elements
 var submitCityEl = document.getElementById("submit-btn");
 var cityInputValue = document.querySelector("#city");
 var searchHistoryQueEl = document.getElementById("search-history-que");
@@ -5,10 +6,13 @@ var weatherContainerEl = document.getElementById("weather-container");
 
 
 
-
+//variables
 var searchHistory =[];
 var apiKey = "30b5c74fd23bcc43c7f01f9048eaa31b"; //30b5c74fd23bcc43c7f01f9048eaa31b
 var cityName = "Albuquerque";
+var weatherDescription = "";
+var weatherIcon;
+var kelvin = 0;
 var dateToday;
 var temp;
 var wind;
@@ -37,7 +41,6 @@ submitCityEl.addEventListener("click", function(){
     cityName = cityInputValue.value;
 
     searchHistory.push(cityName);
-    console.log(searchHistory);
 
     //store local storage
     localStorage.setItem("cityName", cityName);
@@ -80,15 +83,43 @@ function createCity(cityName) {
     weatherContainerEl.innerHTML = "";
 
     //create dom elements
+    var emptyDivContainerEl = document.createElement("div");
     var cityNameEl = document.createElement("h2");
+    var cityTemperatureEl = document.createElement("p");
+    var iconEl = document.createElement("img");
+
+    //do math to covert to farenheit
+    kelvin = cityName.main.temp;
+    var fahrenheit = ((kelvin - 273.15) * (9/5) + 32);
+    var fahrenheitOneDigit = fahrenheit.toFixed(1);
+
+    //weather description
+    weatherDescription = cityName.weather[0].description;
+
+    //weather icon
+    weatherIcon = cityName.weather[0].icon;
+    console.log(weatherIcon);
+
+    //img src
+    iconEl.src = "http://openweathermap.org/img/wn/" + weatherIcon + "@2x.png";
 
     //add text to innerhtml
-    cityNameEl.innerText = cityName.name;
+    cityNameEl.innerHTML = cityName.name;
+    cityTemperatureEl.innerHTML = "Temperature: " + fahrenheitOneDigit;
+    console.log(cityTemperatureEl);
+
+    //add class to elements
+    cityNameEl.className = "col-9";
+    cityTemperatureEl.className = "col -6";
 
 
     //append to dom
-    weatherContainerEl.appendChild(cityNameEl);
-
+    emptyDivContainerEl.appendChild(cityNameEl);
+    emptyDivContainerEl.appendChild(cityTemperatureEl);
+    emptyDivContainerEl.appendChild(iconEl);
+    
+    
+    weatherContainerEl.appendChild(emptyDivContainerEl);
 
 
     
