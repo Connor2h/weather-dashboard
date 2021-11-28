@@ -119,6 +119,18 @@ function createCity(cityName, latLonConversion) {
     cityWindSpeedEl.className = "col -6";
     uvIndexEl.className = "col -6";
 
+    //check uv index and assign color if it is good or bad
+    if(uvIndex <= 2){
+        uvIndexEl.innerHTML = "Favorable Uv Index: " + uvIndex;
+        uvIndexEl.className = "uv-favorable col -6";
+    }else if(uvIndex >= 3 && uvIndex <= 5){
+        uvIndexEl.innerHTML = "Moderate Uv Index: " + uvIndex;
+        uvIndexEl.className = "uv-moderate col -6";
+    }else{
+        uvIndexEl.innerHTML = "Severe Uv Index: " + uvIndex;
+        uvIndexEl.className = "uv-severe col -6";
+    }
+
 
     //append to dom
     emptyDivContainerEl.appendChild(cityNameEl);
